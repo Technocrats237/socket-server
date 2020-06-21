@@ -1,10 +1,5 @@
-/**
- * Author: Matt-Klaus Mushi
- * Email: devloper.mattklaus@gmail.com
- */
-
 const mqtt = require('mqtt');
-const client = mqtt.connect('mqtt://mattklaus-OMEN');
+const client = mqtt.connect('mqtt://raspberrypi');
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -18,20 +13,20 @@ client.on('connect', () => {
 });
 
 client.on('message', (topic, data) => {
-    console.log(`Message received: ${data}`)
+    console.log(`${topic}: ${data} (${typeof data})`)
     // client.publish(topic, message);
     if (io) {
-        io.emit(topic, { value: data, date: new Date()});
+        io.emit(topic, { value: parseFloat(data), date: new Date()});
     }
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected', socket);
+    // console.log('a user connected', socket);
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
 });
 
-http.listen(3000, () => {
+http.listen(3000, '0.0.0.0', () => {
     console.log('listening on *:3000');
 });
